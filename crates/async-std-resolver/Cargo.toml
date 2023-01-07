@@ -63,6 +63,7 @@ system-config = ["trust-dns-resolver/system-config"]
 [lib]
 name = "async_std_resolver"
 path = "src/lib.rs"
+doctest = false
 
 [dependencies]
 async-std = { version = "1.6", features = ["unstable"] }

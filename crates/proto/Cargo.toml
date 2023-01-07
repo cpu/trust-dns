@@ -69,6 +69,7 @@ wasm-bindgen = ["wasm-bindgen-crate", "js-sys"]
 [lib]
 name = "trust_dns_proto"
 path = "src/lib.rs"
+doctest = false
 
 [dependencies]
 async-trait = "0.1.43"

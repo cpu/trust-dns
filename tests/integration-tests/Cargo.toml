@@ -39,6 +39,7 @@ maintenance = { status = "actively-developed" }
 [lib]
 name = "trust_dns_integration"
 path = "src/lib.rs"
+doctest = false
 
 [features]
 dnssec-openssl = ["dnssec",

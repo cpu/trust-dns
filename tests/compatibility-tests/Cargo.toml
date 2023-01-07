@@ -45,6 +45,7 @@ trust_dns_client = []
 [lib]
 name = "trust_dns_compatibility"
 path = "src/lib.rs"
+doctest = false
 
 [dependencies]
 data-encoding = "2.2.0"

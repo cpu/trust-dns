@@ -68,6 +68,7 @@ tokio-runtime = ["tokio/rt", "trust-dns-proto/tokio-runtime"]
 [lib]
 name = "trust_dns_resolver"
 path = "src/lib.rs"
+doctest = false
 
 [dependencies]
 #backtrace = { version = "0.3.50", optional = true }

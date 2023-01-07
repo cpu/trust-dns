@@ -76,6 +76,7 @@ testing = []
 [lib]
 name = "trust_dns_server"
 path = "src/lib.rs"
+doctest = false
 
 [dependencies]
 async-trait = "0.1.43"
