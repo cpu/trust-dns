@@ -343,11 +343,11 @@ impl<S: DnsUdpSocket + QuicLocalAddr> Debug for QuinnAsyncUdpSocketAdapter<S> {
     }
 }
 
-/// TODO: Naive implementation. Look forward to
+/// TODO: Naive implementation. Look forward to future improvements.
 impl<S: DnsUdpSocket + QuicLocalAddr + 'static> AsyncUdpSocket for QuinnAsyncUdpSocketAdapter<S> {
     fn poll_send(
-        &mut self,
-        _state: &quinn_udp::UdpState,
+        &self,
+        _state: &quinn::udp::UdpState,
         cx: &mut Context<'_>,
         transmits: &[quinn::Transmit],
     ) -> Poll<std::io::Result<usize>> {
@@ -395,7 +395,7 @@ impl<S: DnsUdpSocket + QuicLocalAddr + 'static> AsyncUdpSocket for QuinnAsyncUdp
         &self,
         cx: &mut Context<'_>,
         bufs: &mut [std::io::IoSliceMut<'_>],
-        meta: &mut [quinn_udp::RecvMeta],
+        meta: &mut [quinn::udp::RecvMeta],
     ) -> Poll<std::io::Result<usize>> {
         // logics from quinn-udp::fallback.rs
 
@@ -406,7 +406,7 @@ impl<S: DnsUdpSocket + QuicLocalAddr + 'static> AsyncUdpSocket for QuinnAsyncUdp
         match io.poll_recv_from(cx, buf.as_mut()) {
             Poll::Ready(res) => match res {
                 Ok((len, addr)) => {
-                    meta[0] = quinn_udp::RecvMeta {
+                    meta[0] = quinn::udp::RecvMeta {
                         len,
                         stride: len,
                         addr,
