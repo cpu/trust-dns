@@ -18,7 +18,7 @@ exclude = ["fuzz"]
 # tokio = { path = "../tokio/tokio" }
 # mio = { git = "https://github.com/tokio-rs/mio.git" }
 # h2 = { git = "https://github.com/hyperium/h2.git" }
-quinn = { git = 'https://github.com/cpu/quinn', branch = 'cpu-smoke-test-rustls-quic-conns' }
+quinn = { git = 'https://github.com/quinn-rs/quinn' }
 
 [workspace.dependencies]
 # trustdns
