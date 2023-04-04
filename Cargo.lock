@@ -1868,6 +1868,7 @@ dependencies = [
  "rand",
  "ring",
  "rustls",
+ "rustls-webpki",
  "serde",
  "thiserror",
  "time",
@@ -1875,7 +1876,6 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "trust-dns-proto",
- "webpki",
 ]
 
 [[package]]
@@ -1941,6 +1941,7 @@ dependencies = [
  "ring",
  "rustls",
  "rustls-pemfile",
+ "rustls-webpki",
  "serde",
  "smallvec",
  "socket2",
@@ -1954,7 +1955,6 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "wasm-bindgen",
- "webpki",
  "webpki-roots",
 ]
 
@@ -2047,6 +2047,7 @@ dependencies = [
  "data-encoding",
  "openssl",
  "rustls",
+ "rustls-webpki",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2054,7 +2055,6 @@ dependencies = [
  "trust-dns-proto",
  "trust-dns-recursor",
  "trust-dns-resolver",
- "webpki",
  "webpki-roots",
 ]
 
