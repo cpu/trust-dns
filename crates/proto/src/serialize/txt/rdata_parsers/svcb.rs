@@ -351,7 +351,7 @@ mod tests {
 
     #[test]
     fn test_parsing() {
-        let svcb: SVCB = parse_record("crypto.cloudflare.com. 299 IN SVCB 1 . alpn=h2, ipv4hint=162.159.135.79,162.159.136.79, echconfig=\"/gkAQwATY2xvdWRmbGFyZS1lc25pLmNvbQAgUbBtC3UeykwwE6C87TffqLJ/1CeaAvx3iESGyds85l8AIAAEAAEAAQAAAAA=\" ipv6hint=2606:4700:7::a29f:874f,2606:4700:7::a29f:884f,");
+        let svcb: SVCB = parse_record("crypto.cloudflare.com. 1800 IN SVCB 1 . alpn=http/1.1,h2, ipv4hint=162.159.137.85,162.159.138.85, ech=AEX+DQBBFgAgACBefuk9BRsbXLIxY56djXD6DdkkxV7D2D6pDrYMLO9DeAAEAAEAAQASY2xvdWRmbGFyZS1lY2guY29tAAA= ipv6hint=2606:4700:7::a29f:8955,2606:4700:7::a29f:8a55,");
 
         assert_eq!(svcb.svc_priority(), 1);
         assert_eq!(*svcb.target_name(), Name::root());
@@ -361,22 +361,22 @@ mod tests {
         // alpn
         let param = params.next().expect("not alpn");
         assert_eq!(param.0, SvcParamKey::Alpn);
-        assert_eq!(param.1.as_alpn().expect("not alpn").0, &["h2"]);
+        assert_eq!(param.1.as_alpn().expect("not alpn").0, &["http/1.1", "h2"]);
 
         // ipv4 hint
         let param = params.next().expect("ipv4hint");
         assert_eq!(SvcParamKey::Ipv4Hint, param.0);
         assert_eq!(
             param.1.as_ipv4_hint().expect("ipv4hint").0,
-            &[A::new(162, 159, 135, 79), A::new(162, 159, 136, 79)]
+            &[A::new(162, 159, 137, 85), A::new(162, 159, 138, 85)]
         );
 
         // echconfig
-        let param = params.next().expect("echconfig");
+        let param = params.next().expect("ech");
         assert_eq!(SvcParamKey::EchConfig, param.0);
         assert_eq!(
-            param.1.as_ech_config().expect("echconfig").0,
-            data_encoding::BASE64.decode("/gkAQwATY2xvdWRmbGFyZS1lc25pLmNvbQAgUbBtC3UeykwwE6C87TffqLJ/1CeaAvx3iESGyds85l8AIAAEAAEAAQAAAAA=".as_bytes()).unwrap()
+            param.1.as_ech_config().expect("ech").0,
+            data_encoding::BASE64.decode("AEX+DQBBFgAgACBefuk9BRsbXLIxY56djXD6DdkkxV7D2D6pDrYMLO9DeAAEAAEAAQASY2xvdWRmbGFyZS1lY2guY29tAAA=".as_bytes()).unwrap()
         );
 
         // ipv6 hint
@@ -385,20 +385,20 @@ mod tests {
         assert_eq!(
             param.1.as_ipv6_hint().expect("ipv6hint").0,
             &[
-                AAAA::new(0x2606, 0x4700, 0x7, 0, 0, 0, 0xa29f, 0x874f),
-                AAAA::new(0x2606, 0x4700, 0x7, 0, 0, 0, 0xa29f, 0x884f)
+                AAAA::new(0x2606, 0x4700, 0x7, 0, 0, 0, 0xa29f, 0x8955),
+                AAAA::new(0x2606, 0x4700, 0x7, 0, 0, 0, 0xa29f, 0x8a55),
             ]
         );
     }
 
     #[test]
     fn test_parse_display() {
-        let svcb: SVCB = parse_record("crypto.cloudflare.com. 299 IN SVCB 1 . alpn=h2, ipv4hint=162.159.135.79,162.159.136.79, echconfig=\"/gkAQwATY2xvdWRmbGFyZS1lc25pLmNvbQAgUbBtC3UeykwwE6C87TffqLJ/1CeaAvx3iESGyds85l8AIAAEAAEAAQAAAAA=\" ipv6hint=2606:4700:7::a29f:874f,2606:4700:7::a29f:884f,");
+        let svcb: SVCB = parse_record("crypto.cloudflare.com. 1800 IN SVCB 1 . alpn=http/1.1,h2, ipv4hint=162.159.137.85,162.159.138.85, ech=AEX+DQBBFgAgACBefuk9BRsbXLIxY56djXD6DdkkxV7D2D6pDrYMLO9DeAAEAAEAAQASY2xvdWRmbGFyZS1lY2guY29tAAA= ipv6hint=2606:4700:7::a29f:8955,2606:4700:7::a29f:8a55,");
 
         let svcb_display = svcb.to_string();
 
         // add back the name, etc...
-        let svcb_display = format!("crypto.cloudflare.com. 299 IN SVCB {svcb_display}");
+        let svcb_display = format!("crypto.cloudflare.com. 1800 IN SVCB {svcb_display}");
         let svcb_display = parse_record(&svcb_display);
 
         assert_eq!(svcb, svcb_display);
@@ -407,7 +407,7 @@ mod tests {
     /// sanity check for https
     #[test]
     fn test_parsing_https() {
-        let svcb: HTTPS = parse_record("crypto.cloudflare.com. 299 IN HTTPS 1 . alpn=h2, ipv4hint=162.159.135.79,162.159.136.79, echconfig=\"/gkAQwATY2xvdWRmbGFyZS1lc25pLmNvbQAgUbBtC3UeykwwE6C87TffqLJ/1CeaAvx3iESGyds85l8AIAAEAAEAAQAAAAA=\" ipv6hint=2606:4700:7::a29f:874f,2606:4700:7::a29f:884f,");
+        let svcb: HTTPS = parse_record("crypto.cloudflare.com. 1800 IN HTTPS 1 . alpn=http/1.1,h2, ipv4hint=162.159.137.85,162.159.138.85, ech=AEX+DQBBFgAgACBefuk9BRsbXLIxY56djXD6DdkkxV7D2D6pDrYMLO9DeAAEAAEAAQASY2xvdWRmbGFyZS1lY2guY29tAAA= ipv6hint=2606:4700:7::a29f:8955,2606:4700:7::a29f:8a55,");
 
         assert_eq!(svcb.svc_priority(), 1);
         assert_eq!(*svcb.target_name(), Name::root());
