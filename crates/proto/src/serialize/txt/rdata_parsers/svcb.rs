@@ -325,11 +325,43 @@ where
     T::Err: Into<ParseError>,
 {
     let mut result = Vec::new();
+    let mut current_value = String::new();
+    let mut escaped = false;
 
-    let values = value.trim_end_matches(',').split(',');
-    for value in values {
-        let value = parse_char_data(value)?;
-        let value = T::from_str(&value).map_err(|e| e.into())?;
+    for c in value.chars() {
+        match (c, escaped) {
+            (',', false) => {
+                // End of value
+                let parsed_value = parse_char_data(&current_value)?;
+                let value = T::from_str(&parsed_value).map_err(|e| e.into())?;
+                result.push(value);
+                current_value.clear();
+            }
+            ('\\', false) => {
+                // Start of escape sequence
+                escaped = true;
+            }
+            (',', true) => {
+                // Comma inside escape sequence
+                current_value.push(',');
+                escaped = false;
+            }
+            (_, true) => {
+                // Regular character inside escape sequence
+                current_value.push(c);
+                escaped = false;
+            }
+            (_, false) => {
+                // Regular character
+                current_value.push(c);
+            }
+        }
+    }
+
+    // Push the remaining value if there's any
+    if !current_value.is_empty() {
+        let parsed_value = parse_char_data(&current_value)?;
+        let value = T::from_str(&parsed_value).map_err(|e| e.into())?;
         result.push(value);
     }
 
@@ -452,7 +484,7 @@ mod tests {
 
         // NOTE: In each case the test vector from the RFC was augmented with a TTL (42 in each
         //       case. The parser requires this but the test vectors do not include it.
-        let vectors: [TestVector; 8] = [
+        let vectors: [TestVector; 9] = [
             // https://datatracker.ietf.org/doc/html/rfc9460#appendix-D.1
             // Figure 2: AliasMode
             TestVector {
@@ -553,9 +585,30 @@ mod tests {
                 ],
             },
             // Figure 10: An "alpn" Value with an Escaped Comma and an Escaped Backslash in Two Presentation Formats
-            //   example.com.   SVCB   16 foo.example.org. alpn="f\\\\oo\\,bar,h2"
-            //   example.com.   SVCB   16 foo.example.org. alpn=f\\\092oo\092,bar,h2
-            // TODO(XXX): Parser does not handle escaped comma correctly and splits when it shouldn't.
+            TestVector {
+                record: r#"example.com.  42  SVCB   16 foo.example.org. alpn="f\\\\oo\,bar,h2""#,
+                record_type: RecordType::SVCB,
+                target_name: Name::from_str("foo.example.org.").unwrap(),
+                priority: 16,
+                params: vec![(
+                    SvcParamKey::Alpn,
+                    SvcParamValue::Alpn(Alpn(vec![r#"f\\oo,bar"#.to_owned(), "h2".to_owned()])),
+                )],
+            },
+            /*
+             * TODO(XXX): Parser does not replace escaped characters, does not see "\092," as
+             *            an escaped delim.
+            TestVector {
+                record: r#"example.com.  42  SVCB   116 foo.example.org. alpn=f\\\092oo\092,bar,h2""#,
+                record_type: RecordType::SVCB,
+                target_name: Name::from_str("foo.example.org.").unwrap(),
+                priority: 16,
+                params: vec![(
+                    SvcParamKey::Alpn,
+                    SvcParamValue::Alpn(Alpn(vec![r#"f\\oo,bar"#.to_owned(), "h2".to_owned()])),
+                )],
+            },
+            */
         ];
 
         for record in vectors {
