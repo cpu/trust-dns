@@ -114,7 +114,7 @@ fn parse_value(key: SvcParamKey, value: Option<&str>) -> Result<SvcParamValue, P
         SvcParamKey::NoDefaultAlpn => parse_no_default_alpn(value),
         SvcParamKey::Port => parse_port(value),
         SvcParamKey::Ipv4Hint => parse_ipv4_hint(value),
-        SvcParamKey::EchConfig => parse_ech_config(value),
+        SvcParamKey::EchConfigList => parse_ech_config(value),
         SvcParamKey::Ipv6Hint => parse_ipv6_hint(value),
         SvcParamKey::Key(_) => parse_unknown(value),
         SvcParamKey::Key65535 | SvcParamKey::Unknown(_) => {
@@ -256,7 +256,9 @@ fn parse_ech_config(value: Option<&str>) -> Result<SvcParamValue, ParseError> {
 
     let value = parse_char_data(value)?;
     let ech_config_bytes = data_encoding::BASE64.decode(value.as_bytes())?;
-    Ok(SvcParamValue::EchConfig(EchConfig(ech_config_bytes)))
+    Ok(SvcParamValue::EchConfigList(EchConfigList(
+        ech_config_bytes,
+    )))
 }
 
 /// [draft-ietf-dnsop-svcb-https-03 SVCB and HTTPS RRs for DNS, February 2021](https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-03#section-6.4)
@@ -374,9 +376,9 @@ mod tests {
 
         // echconfig
         let param = params.next().expect("ech");
-        assert_eq!(SvcParamKey::EchConfig, param.0);
+        assert_eq!(SvcParamKey::EchConfigList, param.0);
         assert_eq!(
-            param.1.as_ech_config().expect("ech").0,
+            param.1.as_ech_config_list().expect("ech").0,
             data_encoding::BASE64.decode("/gkAQwATY2xvdWRmbGFyZS1lc25pLmNvbQAgUbBtC3UeykwwE6C87TffqLJ/1CeaAvx3iESGyds85l8AIAAEAAEAAQAAAAA=".as_bytes()).unwrap()
         );
 
