@@ -277,7 +277,7 @@ impl fmt::Display for SvcParamKey {
             Self::NoDefaultAlpn => f.write_str("no-default-alpn")?,
             Self::Port => f.write_str("port")?,
             Self::Ipv4Hint => f.write_str("ipv4hint")?,
-            Self::EchConfig => f.write_str("echconfig")?,
+            Self::EchConfig => f.write_str("ech")?,
             Self::Ipv6Hint => f.write_str("ipv6hint")?,
             Self::Key(val) => write!(f, "key{}", val)?,
             Self::Key65535 => f.write_str("key65535")?,
@@ -312,7 +312,7 @@ impl std::str::FromStr for SvcParamKey {
             "no-default-alpn" => Self::NoDefaultAlpn,
             "port" => Self::Port,
             "ipv4hint" => Self::Ipv4Hint,
-            "echconfig" => Self::EchConfig,
+            "ech" => Self::EchConfig,
             "ipv6hint" => Self::Ipv6Hint,
             "key65535" => Self::Key65535,
             _ => parse_unknown_key(s)?,
@@ -931,8 +931,8 @@ impl fmt::Debug for EchConfig {
 pub struct IpHint<T>(pub Vec<T>);
 
 impl<'r, T> BinDecodable<'r> for IpHint<T>
-where
-    T: BinDecodable<'r>,
+    where
+        T: BinDecodable<'r>,
 {
     ///   The wire format for each parameter is a sequence of IP addresses in
     ///   network byte order.  Like an A or AAAA RRSet, the list of addresses
@@ -950,8 +950,8 @@ where
 }
 
 impl<T> BinEncodable for IpHint<T>
-where
-    T: BinEncodable,
+    where
+        T: BinEncodable,
 {
     ///   The wire format for each parameter is a sequence of IP addresses in
     ///   network byte order.  Like an A or AAAA RRSet, the list of addresses
@@ -967,8 +967,8 @@ where
 }
 
 impl<T> fmt::Display for IpHint<T>
-where
-    T: fmt::Display,
+    where
+        T: fmt::Display,
 {
     ///   The presentation "value" SHALL be a comma-separated list
     ///   (Appendix A.1) of one or more IP addresses of the appropriate family
